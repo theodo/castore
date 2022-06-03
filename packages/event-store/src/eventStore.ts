@@ -8,6 +8,51 @@ import {
 
 export type SimulationOptions = { simulationDate?: string };
 
+// DOING: Replacing methods by functions to enable tree-shaking
+export const pushEvent = <
+  E extends EventType[] = EventType[],
+  D extends EventDetail = EventTypesDetails<E>,
+>({
+  eventStore,
+  eventDetail,
+}: {
+  eventStore: EventStore<E, D>;
+  eventDetail: D;
+}): Promise<void> => eventStore.storageAdapter.pushEvent(eventDetail);
+
+export const pushEventTransaction = <
+  E extends EventType[] = EventType[],
+  D extends EventDetail = EventTypesDetails<E>,
+>({
+  eventStore,
+  eventDetail,
+}: {
+  eventStore: EventStore<E, D>;
+  eventDetail: D;
+}): unknown => eventStore.storageAdapter.pushEventTransaction(eventDetail);
+
+export const buildAggregate = <
+  E extends EventType[] = EventType[],
+  D extends EventDetail = EventTypesDetails<E>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  R extends (aggregate: any, event: D) => Aggregate = (
+    aggregate: unknown,
+    event: D,
+  ) => Aggregate,
+  A extends Aggregate = ReturnType<R>,
+>({
+  eventStore,
+  eventDetails,
+}: {
+  eventStore: EventStore<E, D>;
+  eventDetails: D[];
+}): A | undefined =>
+  eventDetails.reduce(eventStore.reduce, undefined as unknown as A) as
+    | A
+    | undefined;
+
+///////////////////////////////
+
 export class EventStore<
   E extends EventType[] = EventType[],
   D extends EventDetail = EventTypesDetails<E>,

@@ -3,7 +3,7 @@ import { A } from 'ts-toolbelt';
 import { EventTypeDetail } from 'event/eventType';
 
 import { JSONSchemaEventType } from './event/implementations/jsonSchema';
-import { EventStore } from './eventStore';
+import { EventStore, pushEvent } from './eventStore';
 import {
   EventsQueryOptions,
   StorageAdapter,
@@ -173,6 +173,14 @@ describe('event store', () => {
       ),
       events: mockEvents,
       lastEvent: mockEvents[mockEvents.length - 1],
+    });
+  });
+
+  it('tries pushEvent function instead of method', async () => {
+    // TODO: type problem to solve
+    await pushEvent({
+      eventStore: counterEventStore,
+      eventDetail: mockEvents[0],
     });
   });
 });
