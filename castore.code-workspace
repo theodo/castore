@@ -45,6 +45,10 @@
       "name": "📚 Event store"
     },
     {
+      "path": "packages/dynamodb-event-storage-adapter",
+      "name": "🔌 Event Storage Adapters: DynamoDb"
+    },
+    {
       "path": "demo/blueprint",
       "name": "✨ Demo: Blueprint"
     },
@@ -59,10 +63,6 @@
     {
       "path": ".",
       "name": "🦫 castore root"
-    },
-    {
-      "path": "packages/dynamodb-event-storage-adapter",
-      "name": "🔌 Event Storage Adapters: DynamoDb [library]"
     }
   ]
 }

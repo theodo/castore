@@ -2,9 +2,9 @@
   "version": 2,
   "projects": {
     "event-store": "packages/event-store",
+    "dynamodb-event-storage-adapter": "packages/dynamodb-event-storage-adapter",
     "demo-blueprint": "demo/blueprint",
     "demo-implementation": "demo/implementation",
-    "demo-visualization": "demo/visualization",
-    "adapters": "packages/dynamodb-event-storage-adapter"
+    "demo-visualization": "demo/visualization"
   }
 }
