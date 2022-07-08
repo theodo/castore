@@ -1,8 +1,12 @@
 name: 🚀 Release to NPM
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'     
+        required: false
+        default: false
 jobs:
   build:
     name: release
@@ -17,6 +21,9 @@ jobs:
         run: |
           git config --global user.email "ci@octokit.com"
           git config --global user.name "@$GITHUB_ACTOR"
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
       - name: "update version"
         run: yarn lerna version ${{ github.event.release.tag_name }}
       - uses: JS-DevTools/npm-publish@v1
