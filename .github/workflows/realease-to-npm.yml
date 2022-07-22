@@ -12,42 +12,20 @@ jobs:
         with:
           ref: 'main'
           token: ${{ secrets.PAT_TOKEN }}
-      - name: Install & cache node dependencies
-        uses: ./.github/actions/install-node-deps
-      - name: Build packages
-        run: yarn package
       - name: Configure Git User
         run: |
           git config --global user.email "ci@octokit.com"
           git config --global user.name "$GITHUB_ACTOR"
           git stash
           git push --delete origin ${{ github.event.release.tag_name }}
-      - name: 'update version'
-        run: yarn lerna version ${{ github.event.release.tag_name }} --yes
       - name: Update yarn.lock with new version
         run: |
-          export YARN_ENABLE_IMMUTABLE_INSTALLS=false
-          yarn
-          git add yarn.lock
           git commit --amend --no-edit
           git push origin --force
-      - uses: JS-DevTools/npm-publish@v1
+      - name: "call action"
+        id: last_release
+        uses: InsonusK/get-latest-release@v1.0.1
         with:
-          token: ${{ secrets.NPM_TOKEN }}
-          package: ./packages/core/package.json
-      - uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          package: ./packages/dynamodb-event-storage-adapter/package.json
-      - uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          package: ./packages/json-schema-event/package.json
-      - uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          package: ./packages/zod-event/package.json
-      - uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          package: ./packages/test-tools/package.json
+          myToken: ${{ secrets.GITHUB_TOKEN }}
+          view_top: 1
+      - run: "curl -X PATCH -H 'Accept: application/vnd.github+json'  -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/valentinbeggi/castore/releases/${{ steps.last_release.outputs.id }} -d '{`draft`:false}'"
