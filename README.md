@@ -18,19 +18,6 @@ const counterCreatedEvent = new JSONSchemaEventType({
   } as const,
 });
 
-const counterIncrementedEvent = new JSONSchemaEventType({
-  type: 'COUNTER_INCREMENTED',
-});
-
-const counterRemovedEvent = new JSONSchemaEventType({
-  type: 'COUNTER_REMOVED',
-});
-
-const eventTypes = [
-  counterCreatedEvent,
-  counterIncrementedEvent,
-  counterRemovedEvent,
-];
 
 // Will infer correct union type 🙌
 type CounterEventDetail = EventTypesDetails<typeof eventTypes>;
@@ -124,12 +111,104 @@ await counterEventStore.pushEvent({
 
 # Event
 
-TODO
+The first step in your ✨ Castore journey ✨ is to define your business events! 🦫
+
+Castore lets you easily create the Event Types which will constitute your Event Store.
+Simply use the EventType class and start defining, once and for all, your events! 🎉
+
+```ts
+import { EventType } from "@castore/core"
+
+export const userCreatedEvent = new EventType<
+  // Typescript EventType
+  'USER_CREATED',
+  // Typescript EventDetails
+  {
+    aggregateId: string;
+    version: number;
+    type: 'USER_CREATED';
+    timestamp: string;
+    payload: { name: string; age: number };
+  }
+>({
+  // EventType
+  type: 'USER_CREATED',
+});
+
+const userRemovedEvent = new EventType({
+  type: 'USER_REMOVED',
+});
+
+const eventTypes = [
+  userCreatedEvent,
+  userRemovedEvent,
+];
+
+```
+
+Once you're happy with your set of EventTypes you can move on to step 2: attaching the EventTypes to an actual EventStore! 🏪.
+
 
 # Event Store
 
-TODO
+Welcome in the heart of Castore: the EventStore ❤️<br/>
+The `EventStore` class lets you instantiate an object containing all the methods you will need to interact with your store. 💪
 
+```typescript
+const userEventStore = new EventStore({
+  eventStoreId: 'Users',
+  eventTypes,
+  // 👇 See #reducer sub-section
+  reducer,
+  // 👇 See #storage_adapters section
+  storageAdapter,
+});
+```
+
+The class exposes 3 main methods
+
+`getAggregate`: 
+
+
+## Reducer
+
+The reducer needed in the EventStore initialization is the function that will be applied to the sorted array of events in order to build the aggregate. ⚙️
+
+Its interface is `(Aggregate, Union of all Events Details) => Aggregate`
+
+Basically, it consists in a function implementing switch cases for all event types and returning the aggregate updated with your business logic. 🧠
+
+Here is an example reducer for our User Event Store.
+
+```ts
+export const usersReducer = (
+  userAggregate: UserAggregate,
+  event: UserEventsDetails,
+): UserAggregate => {
+  const { version, aggregateId } = event;
+
+  switch (event.type) {
+    case 'USER_CREATED': {
+      const { name, age } = event.payload;
+
+      return {
+        aggregateId,
+        version: event.version,
+        name,
+        age,
+        status: 'CREATED',
+      };
+    }
+    case 'USER_REMOVED':
+      return {
+        ...userAggregate,
+        version,
+        status: 'DELETED',
+      };
+  }
+};
+
+```
 # Storage Adapter
 
 TODO
