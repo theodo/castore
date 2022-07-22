@@ -27,6 +27,5 @@ jobs:
         uses: InsonusK/get-latest-release@v1.0.1
         with:
           myToken: ${{ secrets.GITHUB_TOKEN }}
-          exclude_types: "release"
           view_top: 1
-      - run: "curl -X PATCH -H 'Accept: application/vnd.github+json'  -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/theodo/castore/releases/${{ steps.last_release.outputs.id }} -d '{`draft`:false}'"
+      - run: "curl -X PATCH -H 'Accept: application/vnd.github+json'  -H 'Authorization: token ${{ secrets.GITHUB_TOKEN }}' https://api.github.com/repos/valentinbeggi/castore/releases/${{ steps.last_release.outputs.id }} -d '{`draft`:false}'"
