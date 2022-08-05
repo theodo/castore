@@ -6,5 +6,9 @@ export const mockEventStore = <E extends EventStore = EventStore>(
   events: EventStoreEventsDetails<E>[],
 ): void => {
   eventStore.storageAdapter = new InMemoryStorageAdapter();
-  events.map(event => eventStore.pushEvent(event));
+  events.map(event =>
+    eventStore.storageAdapter?.pushEvent(event, {
+      eventStoreId: eventStore.eventStoreId,
+    }),
+  );
 };
